@@ -17,15 +17,15 @@ object CommentService: CrudService<Comment> {
         return comments.filter{!it.deleted}
     }
 
-    fun read(note: Note): List<Comment> {
-        return comments.filter{!it.deleted && it.noteId == note.id}
-    }
-
     override fun getById(id: Long): Comment {
         return comments.filter{it.id == id}[0]
     }
 
     override fun restore(id: Long) {
         comments.filter{it.id == id}[0].deleted = false
+    }
+
+    fun read(note: Note): List<Comment> {
+        return comments.filter{!it.deleted && it.noteId == note.id}
     }
 }
