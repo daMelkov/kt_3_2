@@ -1,8 +1,11 @@
 object CommentService: CrudService<Comment> {
-    private var comments = emptyArray<Comment>()
+    private var comments = ArrayList<Comment>()
 
-    override fun add(entity: Comment) {
-        comments.plus(entity)
+    override fun add(entity: Comment): Long {
+        val id = (comments.size + 1).toLong()
+        comments.add(entity.copy(id = id))
+
+        return id
     }
 
     override fun delete(id: Long) {
@@ -10,7 +13,8 @@ object CommentService: CrudService<Comment> {
     }
 
     override fun edit(entity: Comment) {
-        comments += entity.copy(message = entity.message)
+        comments.remove(getById(entity.id))
+        comments.add(entity.copy(message = entity.message))
     }
 
     override fun read(): List<Comment> {

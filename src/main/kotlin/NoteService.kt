@@ -1,9 +1,11 @@
 object NoteService: CrudService<Note> {
-    private var notes = emptyArray<Note>()
-    private val commentService = CommentService
+    private var notes = ArrayList<Note>()
 
-    override fun add(entity: Note) {
-        notes.plus(entity)
+    override fun add(entity: Note): Long {
+        val id = (notes.size + 1).toLong()
+        notes.add(entity.copy(id = id))
+
+        return id
     }
 
     override fun delete(id: Long) {
@@ -11,7 +13,8 @@ object NoteService: CrudService<Note> {
     }
 
     override fun edit(entity: Note) {
-        notes += entity.copy(title = entity.title, text = entity.text)
+        notes.remove(getById(entity.id))
+        notes.add(entity.copy(title = entity.title, text = entity.text))
     }
 
     override fun read(): List<Note> {
@@ -26,25 +29,21 @@ object NoteService: CrudService<Note> {
         notes.filter{it.id == id}[0].deleted = false
     }
 
-    fun createComment(noteId: Long, ownerId: Long, replyTo: Long, message: String) {
-        if(getById(noteId) == null) {
-            return
-        }
-
-        val comment = Comment(noteId, ownerId, replyTo, message)
-        commentService.add(comment)
+    fun createComment(noteId: Long, ownerId: Long, replyTo: Long, message: String): Long {
+        val comment = Comment(id = 0, noteId, ownerId, replyTo, message)
+        return CommentService.add(comment)
     }
 
     fun deleteComment(id: Long) {
-        commentService.delete(id)
+        CommentService.delete(id)
     }
 
     fun editComment(id: Long, ownerId: Long, message: String) {
-        val comment = commentService.getById(id).copy(ownerId = ownerId, message = message)
-        commentService.edit(comment)
+        val comment = CommentService.getById(id).copy(ownerId = ownerId, message = message)
+        CommentService.edit(comment)
     }
 
     fun getComments(noteId: Long): List<Comment> {
-        return commentService.read(getById(noteId))
+        return CommentService.read(getById(noteId))
     }
 }

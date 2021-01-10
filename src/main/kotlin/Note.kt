@@ -1,4 +1,3 @@
-data class Note (val title: String, val text: String) {
-    var id: Long = 0
+data class Note (val id: Long = 0, val title: String, val text: String) {
     var deleted: Boolean = false
 }
